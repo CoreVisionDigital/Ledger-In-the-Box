@@ -1,21 +1,24 @@
-# Security Policy
+# Security Policy - BizLedger
+
+## Overview
+BizLedger is designed with financial compliance, strict tenant data isolation, and robust Attribute-Based Access Control (ABAC) in Google Cloud Firestore.
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+| Version | Supported          | Status |
+| ------- | ------------------ | ------ |
+| 1.0.x   | :white_check_mark: | Active production release |
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+## Architecture & Data Protection
+- **Multi-Tenant Isolation**: Business entities, invoices, receipts, customers, and bank accounts are guarded by strict Firestore Security Rules. Cross-tenant access is forbidden.
+- **Role-Based Access Control (RBAC)**: Supports `owner`, `admin`, `accountant`, and `viewer` tiers.
+- **Account Owner Governance**: Super Administrator governance restricted to designated platform owner (`mode.bproduction@gmail.com`).
+- **Precision Financial Accounting**: Strict minor units (100 Kobo = ₦1) preventing floating-point calculation errors.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability or logic leak in BizLedger:
+1. Please email **mode.bproduction@gmail.com** with details of the vulnerability, reproduction steps, and potential impact.
+2. Please do not report security vulnerabilities through public GitHub issues.
+3. You will receive an acknowledgment within 24-48 hours. Valid reports will be prioritized and resolved promptly.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
