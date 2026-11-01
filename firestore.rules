@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && (request.auth.token.email == 'mode.bproduction@gmail.com');
+    }
+
+    function isBusinessOwner(businessId) {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        (exists(/databases/$(database)/documents/businesses/$(businessId)) &&
+        get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid)
+      );
+    }
+
+    function isBusinessMember(businessId) {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        isBusinessOwner(businessId) ||
+        exists(/databases/$(database)/documents/business_members/$(businessId + '_' + request.auth.uid))
+      );
+    }
+
+    // Businesses collection
+    match /businesses/{businessId} {
+      allow read: if isSignedIn() && (
+        isSuperAdmin() ||
+        resource.data.ownerId == request.auth.uid ||
+        exists(/databases/$(database)/documents/business_members/$(businessId + '_' + request.auth.uid))
+      );
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        isSuperAdmin() ||
+        resource.data.ownerId == request.auth.uid
+      );
+      allow delete: if isSignedIn() && (
+        isSuperAdmin() ||
+        resource.data.ownerId == request.auth.uid
+      );
+    }
+
+    // Business Members collection
+    match /business_members/{memberId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        isBusinessMember(resource.data.businessId)
+      );
+      allow create: if isSignedIn() && (
+        request.resource.data.userId == request.auth.uid ||
+        isBusinessMember(request.resource.data.businessId)
+      );
+      allow update, delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Customers collection
+    match /customers/{customerId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Products / Services collection
+    match /products_services/{productId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Invoices collection
+    match /invoices/{invoiceId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Quotations collection
+    match /quotations/{quotationId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Payments collection
+    match /payments/{paymentId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Receipts collection
+    match /receipts/{receiptId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Expenses collection
+    match /expenses/{expenseId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update: if isSignedIn() && isBusinessMember(resource.data.businessId) && request.resource.data.businessId == resource.data.businessId;
+      allow delete: if isSignedIn() && isBusinessMember(resource.data.businessId);
+    }
+
+    // Audit logs collection (append-only)
+    match /audit_logs/{logId} {
+      allow read, list: if isSignedIn() && isBusinessMember(resource.data.businessId);
+      allow create: if isSignedIn() && isBusinessMember(request.resource.data.businessId);
+      allow update, delete: if false;
+    }
+  }
+}

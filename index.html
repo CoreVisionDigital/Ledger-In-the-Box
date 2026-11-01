@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        // 1. Suppress unhandled exceptions originating from third-party browser extensions (such as Urban VPN chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon)
+        var isExtensionError = function(msg, src) {
+          return (
+            (typeof src === 'string' && src.indexOf('chrome-extension://') !== -1) ||
+            (typeof msg === 'string' && msg.indexOf('Cannot set property fetch') !== -1)
+          );
+        };
+
+        window.addEventListener('error', function(event) {
+          if (
+            isExtensionError(event.message, event.filename) ||
+            (event.error && isExtensionError(event.error.message, event.filename))
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+
+        var prevOnError = window.onerror;
+        window.onerror = function(msg, url, line, col, err) {
+          if (isExtensionError(msg, url) || (err && isExtensionError(err.message, url))) {
+            return true;
+          }
+          if (typeof prevOnError === 'function') {
+            return prevOnError.apply(this, arguments);
+          }
+        };
+
+        // 2. Fetch property descriptor shim to ensure window.fetch is writable and configurable
+        try {
+          var origFetch = typeof window !== 'undefined' ? window.fetch : null;
+          if (origFetch) {
+            var boundFetch = origFetch.bind ? origFetch.bind(window) : origFetch;
+            try {
+              Object.defineProperty(window, 'fetch', {
+                value: boundFetch,
+                writable: true,
+                configurable: true,
+                enumerable: true
+              });
+            } catch (e1) {
+              try {
+                var _currentFetch = boundFetch;
+                Object.defineProperty(window, 'fetch', {
+                  get: function() { return _currentFetch; },
+                  set: function(v) { _currentFetch = v; },
+                  configurable: true,
+                  enumerable: true
+                });
+              } catch (e2) {}
+            }
+
+            if (typeof Window !== 'undefined' && Window.prototype) {
+              try {
+                Object.defineProperty(Window.prototype, 'fetch', {
+                  value: boundFetch,
+                  writable: true,
+                  configurable: true,
+                  enumerable: true
+                });
+              } catch (e3) {
+                try {
+                  var _protoFetch = boundFetch;
+                  Object.defineProperty(Window.prototype, 'fetch', {
+                    get: function() { return _protoFetch; },
+                    set: function(v) { _protoFetch = v; },
+                    configurable: true,
+                    enumerable: true
+                  });
+                } catch (e4) {}
+              }
+            }
+          }
+        } catch (err) {}
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BizLedger - Nigerian Financial Management SaaS</title>
+    <meta name="description" content="Nigerian-first financial management SaaS platform featuring business multi-tenancy, invoicing, quotations, receipts, expenses, customer tracking, and financial analytics in NGN." />
+    <meta property="og:title" content="BizLedger - Nigerian Financial Management SaaS" />
+    <meta property="og:description" content="Nigerian-first financial management SaaS platform featuring business multi-tenancy, invoicing, quotations, receipts, expenses, customer tracking, and financial analytics in NGN." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-emerald-500 selection:text-white min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

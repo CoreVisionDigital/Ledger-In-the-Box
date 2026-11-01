@@ -1,0 +1,269 @@
+{
+  "entities": {
+    "Business": {
+      "title": "Business",
+      "description": "Registered business entity in BizLedger with Nigerian CAC/TIN details and settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "rcNumber": { "type": "string", "maxLength": 50 },
+        "taxIdentificationNumber": { "type": "string", "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 250 },
+        "state": { "type": "string", "maxLength": 50 },
+        "currency": { "type": "string", "maxLength": 10 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "defaultVatPercent": { "type": "number" },
+        "defaultWhtPercent": { "type": "number" },
+        "bankName": { "type": "string", "maxLength": 100 },
+        "accountNumber": { "type": "string", "maxLength": 30 },
+        "accountName": { "type": "string", "maxLength": 150 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "ownerId", "currency"]
+    },
+    "BusinessMember": {
+      "title": "BusinessMember",
+      "description": "User membership and role in a business for access control",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "role": { "type": "string", "enum": ["owner", "admin", "accountant", "viewer"] },
+        "status": { "type": "string", "enum": ["active", "invited"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "userId", "role", "status"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Client profile with Nigerian contact details, balances, and transaction aggregates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 250 },
+        "state": { "type": "string", "maxLength": 50 },
+        "outstandingBalanceMinor": { "type": "number" },
+        "totalInvoicedMinor": { "type": "number" },
+        "totalPaidMinor": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "name"]
+    },
+    "ProductService": {
+      "title": "ProductService",
+      "description": "Catalog of goods and services with pricing in minor kobo units",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 500 },
+        "priceMinor": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "type": { "type": "string", "enum": ["product", "service"] },
+        "unit": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "name", "priceMinor", "currency"]
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Commercial sales invoice with line items, VAT, WHT, and payment tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "invoiceNumber": { "type": "string", "maxLength": 50 },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string", "maxLength": 150 },
+        "customerEmail": { "type": "string", "maxLength": 100 },
+        "customerPhone": { "type": "string", "maxLength": 30 },
+        "customerAddress": { "type": "string", "maxLength": 250 },
+        "issueDate": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "paymentTerms": { "type": "string", "maxLength": 50 },
+        "subtotalMinor": { "type": "number" },
+        "discountMinor": { "type": "number" },
+        "taxVatMinor": { "type": "number" },
+        "taxWhtMinor": { "type": "number" },
+        "totalMinor": { "type": "number" },
+        "amountPaidMinor": { "type": "number" },
+        "balanceDueMinor": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "sent", "partially_paid", "paid", "overdue", "cancelled"] },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "invoiceNumber", "customerId", "totalMinor", "status"]
+    },
+    "Quotation": {
+      "title": "Quotation",
+      "description": "Sales quotation/estimate convertible to commercial invoice",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "quotationNumber": { "type": "string", "maxLength": 50 },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string", "maxLength": 150 },
+        "customerEmail": { "type": "string", "maxLength": 100 },
+        "customerPhone": { "type": "string", "maxLength": 30 },
+        "customerAddress": { "type": "string", "maxLength": 250 },
+        "issueDate": { "type": "string" },
+        "validityDate": { "type": "string" },
+        "subtotalMinor": { "type": "number" },
+        "discountMinor": { "type": "number" },
+        "taxVatMinor": { "type": "number" },
+        "totalMinor": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "sent", "accepted", "rejected", "expired", "converted"] },
+        "convertedInvoiceId": { "type": "string" },
+        "convertedAt": { "type": "string" },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "quotationNumber", "customerId", "totalMinor", "status"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Customer payment record with allocation and Nigerian payment methods",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "paymentNumber": { "type": "string", "maxLength": 50 },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string", "maxLength": 150 },
+        "invoiceId": { "type": "string" },
+        "invoiceNumber": { "type": "string", "maxLength": 50 },
+        "amountMinor": { "type": "number" },
+        "paymentDate": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["bank_transfer", "pos", "cash", "ussd", "online"] },
+        "reference": { "type": "string", "maxLength": 100 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "receiptIssued": { "type": "boolean" },
+        "receiptId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "paymentNumber", "customerId", "amountMinor", "paymentMethod"]
+    },
+    "Receipt": {
+      "title": "Receipt",
+      "description": "Official payment receipt generated from verified payment record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "receiptNumber": { "type": "string", "maxLength": 50 },
+        "paymentId": { "type": "string" },
+        "paymentReference": { "type": "string", "maxLength": 100 },
+        "invoiceId": { "type": "string" },
+        "invoiceNumber": { "type": "string", "maxLength": 50 },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string", "maxLength": 150 },
+        "amountMinor": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "paymentDate": { "type": "string" },
+        "issuedAt": { "type": "string" },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "businessId", "receiptNumber", "paymentId", "amountMinor"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Operating expense record categorized by Nigerian business cost centers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "expenseNumber": { "type": "string", "maxLength": 50 },
+        "category": { "type": "string", "maxLength": 50 },
+        "categoryName": { "type": "string", "maxLength": 100 },
+        "amountMinor": { "type": "number" },
+        "expenseDate": { "type": "string" },
+        "description": { "type": "string", "maxLength": 500 },
+        "vendor": { "type": "string", "maxLength": 150 },
+        "paymentMethod": { "type": "string", "maxLength": 50 },
+        "reference": { "type": "string", "maxLength": 100 },
+        "receiptNote": { "type": "string", "maxLength": 200 },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "businessId", "amountMinor", "category", "expenseDate"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Financial audit trail record for mutations and compliance",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "entityType": { "type": "string" },
+        "entityId": { "type": "string" },
+        "action": { "type": "string" },
+        "description": { "type": "string", "maxLength": 500 },
+        "userId": { "type": "string" },
+        "userName": { "type": "string", "maxLength": 150 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "businessId", "entityType", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/businesses/{businessId}": {
+      "schema": "Business",
+      "description": "Business profile and configuration"
+    },
+    "/business_members/{memberId}": {
+      "schema": "BusinessMember",
+      "description": "Member association linking users to businesses with roles"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customer contacts and financial balances scoped to business"
+    },
+    "/products_services/{productId}": {
+      "schema": "ProductService",
+      "description": "Inventory items and services scoped to business"
+    },
+    "/invoices/{invoiceId}": {
+      "schema": "Invoice",
+      "description": "Sales invoices with line items and balance tracking"
+    },
+    "/quotations/{quotationId}": {
+      "schema": "Quotation",
+      "description": "Sales estimates and quotes with conversion tracking"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Inward payment records and invoice allocations"
+    },
+    "/receipts/{receiptId}": {
+      "schema": "Receipt",
+      "description": "Official receipts linked directly to payments"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Operating and capital expenses"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Append-only immutable audit trail for compliance"
+    }
+  }
+}

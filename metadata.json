@@ -1,0 +1,8 @@
+{
+  "name": "BizLedger - Nigerian Financial Management SaaS",
+  "description": "Nigerian-first financial management SaaS platform featuring business multi-tenancy, invoicing, quotations, receipts, expenses, customer tracking, and financial analytics in NGN.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
